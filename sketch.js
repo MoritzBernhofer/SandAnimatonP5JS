@@ -2,7 +2,24 @@ let grid;
 let rowCount = 100;
 let rowSize = 100;
 let boxSize = 10;
-let hue = 180;
+let hue = 0;
+let brightness = 40;
+
+let hueMinInput;
+let hueMaxInput;
+let hueChangeInput;
+
+let hueMin;
+let hueMax;
+let hueChange;
+
+
+let sandCount;
+
+interface value{
+
+}
+
 function createGrid() {
     let result = [];
     for (let i = 0; i < rowCount; i++) {
@@ -50,7 +67,7 @@ function updateGrid() {
                     }
                 }
 
-                if (isValidPosition(nX, nY)) {
+                if (isValidPosition(nX, nY) && newGrid[nX][nY] === 0) {
                     newGrid[nX][nY] = grid[i][j];
                 } else {
                     newGrid[i][j] = grid[i][j];
@@ -61,7 +78,7 @@ function updateGrid() {
     grid = newGrid;
 }
 
-function isValidPosition(x, y) {
+function isValidPosition(x, y, newGrid) {
     return x < rowSize
         && x >= 0
         && y < rowCount
@@ -74,6 +91,23 @@ function setup() {
     grid = createGrid();
 
     colorMode(HSB, 360, 100, 100);
+
+    createP("Choose min and a max value for the color (0-360) and a change rate (0 to 180)");
+
+    hueMinInput = createInput("0");
+    hueMaxInput = createInput("360");
+    hueChangeInput = createInput("0.5");
+
+    createP("Amount of sand");
+    sandCount = createP("0");
+
+    createP("<img id='color-wheel' src=\"https://i.stack.imgur.com/PokCt.png\">");
+
+
+
+    hueMin = hueMinInput.value();
+    hueMax = hueMaxInput.value();
+    hueChange = hueChangeInput.value();
 }
 
 function mouseDragged() {
@@ -91,14 +125,35 @@ function mouseDragged() {
         }
     }
 
-    hue += 0.5;
+    hue += Number.parseFloat(hueChange);
 
-    if (hue >= 320) {
-        hue = 180;
+    if (hue >= hueMax) {
+        hue = hueMin;
+    }
+
+    brightness += 0.5;
+
+    if(brightness >= 100){
+        brightness = 40;
     }
 }
 
+
 function draw() {
+    hueMin = Number.parseInt(hueMinInput.value());
+    hueMax = Number.parseInt(hueMaxInput.value());
+    hueChange = Number.parseFloat(hueChangeInput.value());
+
+    if(hue > hueMax || hue < hueMin){
+        hue = hueMin;
+    }
+
+    if(isNaN(hue)){
+        hue = hueMin;
+    }
+
+    sandCount.html(grid.flat().reduce((previousValue, currentValue) => previousValue + (currentValue > 0 ? 1 : 0)));
+
     background("black");
 
     drawGrid();
